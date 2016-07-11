@@ -9,7 +9,7 @@ setup(
     author='Nikolay Mityukov',
     author_email='xenoaura@gmail.com',
     license='GNU GENERAL PUBLIC LICENSE',
-    packages=['yandex-domain-mail'],
+    packages=find_packages(),
     install_requires=[
         'requests',
     ],
