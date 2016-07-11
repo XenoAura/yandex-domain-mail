@@ -6,7 +6,7 @@
 ### Установка
 
 ```python
-pip install git+https://github.com/XenoAura/yandex-domain-mail.git
+pip install yandex-domain-mail
 ```
 
 ### Пример
