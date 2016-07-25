@@ -16,11 +16,11 @@ class DomainMail(object):
         self.domain = domain
         self.domain_info()
 
-    def api_method(self, method, values=None):
+    def api_method(self, method, type='email', values=None):
         if not values:
             values = {}
         values.update({'domain': self.domain})
-        request_url = self.api_url + 'email/'
+        request_url = self.api_url + type + '/'
         post_methods = ['add', 'del', 'edit']
         get_methods = ['list?', 'ml/list?', 'ml/subscribers?']
         if method in post_methods:
@@ -82,7 +82,13 @@ class DomainMail(object):
             values.update(params)
         response = self.api_method('edit', values=values)
         return response['account']
-
+    
+    def get_dns_records(self):
+        """
+        Метод получения списка всех DNS-записей для домена
+        """
+        response = self.api_method('list?', type='dns')
+        return response
 
     def get_mails(self):
         """
