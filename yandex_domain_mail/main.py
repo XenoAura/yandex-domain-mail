@@ -89,6 +89,14 @@ class DomainMail(object):
         """
         response = self.api_method('list?', type='dns')
         return response
+        
+    def delete_dns_record(self, record_id):
+        """
+        Метод для удаления dns записи
+        """
+        values = {'record_id': record_id}
+        response = self.api_method('del', type='dns', values=values)
+        return response
 
     def get_mails(self):
         """
