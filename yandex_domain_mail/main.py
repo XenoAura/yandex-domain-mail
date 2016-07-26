@@ -93,13 +93,39 @@ class DomainMail(object):
     def delete_dns_record(self, record_id):
         """
         Метод для удаления dns записи
-        :params record_id: int
+        :param record_id: int
         """
         values = {'record_id': record_id}
         response = self.api_method('del', type='dns', values=values)
         return response
         
-    def 
+    def add_dns_record(self, type, 
+                       admin_mail=None, content=None, priority=None, 
+                       weight=None, port=None, target=None, 
+                       subdomain=None, ttl=None):
+        """
+        Метод для добавления dns записи
+        :param type: string
+        :param admin_mail: string
+        :param content: string
+        :param priority: int
+        :param weight: int
+        :param port: int
+        :param target: string
+        :param subdomain: string
+        :param ttl: int
+        """
+        values = {'type': type,
+                  'admin_mail': admin_mail,
+                  'content': content,
+                  'priority': priority,
+                  'weight': weight,
+                  'port': port,
+                  'target': target,
+                  'subdomain': subdomain,
+                  'ttl': ttl}
+        response = self.api_method('add', type='dns', values=values)
+        return response
 
     def get_mails(self):
         """
