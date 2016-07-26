@@ -131,10 +131,10 @@ class DomainMail(object):
                        admin_mail=None, content=None, priority=None, 
                        weight=None, port=None, target=None, 
                        subdomain=None, ttl=None, refresh=None,
-                       retry=None, expire=None, neg_cache=None)
+                       retry=None, expire=None, neg_cache=None):
         """
         Метод для добавления dns записи
-        :param type: string
+        :param record_id: int
         :param admin_mail: string
         :param content: string
         :param priority: int
@@ -148,7 +148,7 @@ class DomainMail(object):
         :param expire: int
         :param neg_cache: int
         """
-        values = {'type': type,
+        values = {'record_id': record_id,
                   'admin_mail': admin_mail,
                   'content': content,
                   'priority': priority,
