@@ -126,6 +126,43 @@ class DomainMail(object):
                   'ttl': ttl}
         response = self.api_method('add', type='dns', values=values)
         return response
+        
+    def edit_dns_record(self, record_id, 
+                       admin_mail=None, content=None, priority=None, 
+                       weight=None, port=None, target=None, 
+                       subdomain=None, ttl=None, refresh=None
+                       retry=None, expire=None, neg_cache=None)
+        """
+        Метод для добавления dns записи
+        :param type: string
+        :param admin_mail: string
+        :param content: string
+        :param priority: int
+        :param weight: int
+        :param port: int
+        :param target: string
+        :param subdomain: string
+        :param ttl: int
+        :param refresh: int
+        :param retry: int
+        :param expire: int
+        :param neg_cache: int
+        """
+        values = {'type': type,
+                  'admin_mail': admin_mail,
+                  'content': content,
+                  'priority': priority,
+                  'weight': weight,
+                  'port': port,
+                  'target': target,
+                  'subdomain': subdomain,
+                  'ttl': ttl,
+                  'refresh': refresh,
+                  'retry': retry,
+                  'expire': expire,
+                  'neg_cache': neg_cache}
+        response = self.api_method('edit', type='dns', values=values)
+        return response
 
     def get_mails(self):
         """
