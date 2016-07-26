@@ -130,7 +130,7 @@ class DomainMail(object):
     def edit_dns_record(self, record_id, 
                        admin_mail=None, content=None, priority=None, 
                        weight=None, port=None, target=None, 
-                       subdomain=None, ttl=None, refresh=None
+                       subdomain=None, ttl=None, refresh=None,
                        retry=None, expire=None, neg_cache=None)
         """
         Метод для добавления dns записи
