@@ -16,11 +16,11 @@ class DomainMail(object):
         self.domain = domain
         self.domain_info()
 
-    def api_method(self, method, values=None):
+    def api_method(self, method, type='email', values=None):
         if not values:
             values = {}
         values.update({'domain': self.domain})
-        request_url = self.api_url + 'email/'
+        request_url = self.api_url + type + '/'
         post_methods = ['add', 'del', 'edit']
         get_methods = ['list?', 'ml/list?', 'ml/subscribers?']
         if method in post_methods:
@@ -82,7 +82,87 @@ class DomainMail(object):
             values.update(params)
         response = self.api_method('edit', values=values)
         return response['account']
-
+    
+    def get_dns_records(self):
+        """
+        Метод получения списка всех DNS-записей для домена
+        """
+        response = self.api_method('list?', type='dns')
+        return response
+        
+    def delete_dns_record(self, record_id):
+        """
+        Метод для удаления dns записи
+        :param record_id: int
+        """
+        values = {'record_id': record_id}
+        response = self.api_method('del', type='dns', values=values)
+        return response
+        
+    def add_dns_record(self, type, 
+                       admin_mail=None, content=None, priority=None, 
+                       weight=None, port=None, target=None, 
+                       subdomain=None, ttl=None):
+        """
+        Метод для добавления dns записи
+        :param type: string
+        :param admin_mail: string
+        :param content: string
+        :param priority: int
+        :param weight: int
+        :param port: int
+        :param target: string
+        :param subdomain: string
+        :param ttl: int
+        """
+        values = {'type': type,
+                  'admin_mail': admin_mail,
+                  'content': content,
+                  'priority': priority,
+                  'weight': weight,
+                  'port': port,
+                  'target': target,
+                  'subdomain': subdomain,
+                  'ttl': ttl}
+        response = self.api_method('add', type='dns', values=values)
+        return response
+        
+    def edit_dns_record(self, record_id, 
+                       admin_mail=None, content=None, priority=None, 
+                       weight=None, port=None, target=None, 
+                       subdomain=None, ttl=None, refresh=None,
+                       retry=None, expire=None, neg_cache=None):
+        """
+        Метод для добавления dns записи
+        :param record_id: int
+        :param admin_mail: string
+        :param content: string
+        :param priority: int
+        :param weight: int
+        :param port: int
+        :param target: string
+        :param subdomain: string
+        :param ttl: int
+        :param refresh: int
+        :param retry: int
+        :param expire: int
+        :param neg_cache: int
+        """
+        values = {'record_id': record_id,
+                  'admin_mail': admin_mail,
+                  'content': content,
+                  'priority': priority,
+                  'weight': weight,
+                  'port': port,
+                  'target': target,
+                  'subdomain': subdomain,
+                  'ttl': ttl,
+                  'refresh': refresh,
+                  'retry': retry,
+                  'expire': expire,
+                  'neg_cache': neg_cache}
+        response = self.api_method('edit', type='dns', values=values)
+        return response
 
     def get_mails(self):
         """
