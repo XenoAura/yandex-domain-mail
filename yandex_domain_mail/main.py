@@ -4,8 +4,8 @@ import json
 
 
 class DomainMail(object):
-
-    api_url = 'https://pddimp.yandex.ru/api2/admin/'   #ссылка доступа к API
+    # ссылка доступа к API
+    api_url = 'https://pddimp.yandex.ru/api2/admin/'
 
     def __init__(self, token, domain):
         """
@@ -24,12 +24,21 @@ class DomainMail(object):
         post_methods = ['add', 'del', 'edit']
         get_methods = ['list?', 'ml/list?', 'ml/subscribers?']
         if method in post_methods:
-            response = requests.post(request_url+method, data=values, headers=self.headers)
+            response = requests.post(request_url + method, data=values,
+                                     headers=self.headers)
         elif method in get_methods:
-            response = requests.get(request_url+method, data=values, headers=self.headers)
+            response = requests.get(request_url + method, data=values,
+                                    headers=self.headers)
         else:
             raise Exception("NotMethodName: ".format(method))
         return json.loads(response.text)
+
+    def _check_query_result(self, login, response):
+        if response['success'] == 'error':
+            result = response['error']
+        else:
+            result = response['success']
+        return {'login': login, 'success': result}
 
     def domain_info(self):
         """
@@ -38,14 +47,25 @@ class DomainMail(object):
         """
         request_url = self.api_url + 'domain/'
         values = {'domain': self.domain}
-        response = requests.get(request_url+'registration_status?', data=values, headers=self.headers).text
-        if 'bad_token' in response:
-            raise Exception('Bad token!!!')
-        elif 'added' in response:
-            print("Домен {} зарегистрирован на yandex почте.".format(self.domain))
+        response_text = requests.get(request_url + 'registration_status?',
+                                     data=values, headers=self.headers).text
+        response = json.loads(response_text)
+        if response['success'] == 'ok':
+            print("Домен {} зарегистрирован на yandex почте.".format(
+                self.domain))
         else:
-            raise Exception('Неизвестная ошибка')
+            error = response['error']
+            raise Exception(error)
 
+    def get_domains(self):
+        """
+        Запрос позволяет получить список доменов пользователя.
+        :return:
+        """
+        request_url = self.api_url + 'domain/domains'
+        response = requests.get(request_url, headers=self.headers)
+        domains = json.loads(response.text)
+        return domains['domains']
 
     def create_mail(self, login, password):
         """
@@ -54,10 +74,10 @@ class DomainMail(object):
         :param password: пароль пользователя
         :return:
         """
-        #TODO добавить проверку на существование ящика, и возвращать значение в случае успешного создания
         values = {'login': login, 'password': password}
         response = self.api_method('add', values=values)
-        print(response)
+        result = self._check_query_result(login, response)
+        return result
 
     def delete_mail(self, login):
         """
@@ -65,10 +85,10 @@ class DomainMail(object):
         :param login:  логин пользователя
         :return:
         """
-        #TODO добавить проверку успешного удаления и существования ящика
         values = {'login': login}
         response = self.api_method('del', values=values)
-        print(response)
+        result = self._check_query_result(login, response)
+        return result
 
     def edit_mail(self, login, params=None):
         """
@@ -81,15 +101,16 @@ class DomainMail(object):
         if params:
             values.update(params)
         response = self.api_method('edit', values=values)
-        return response['account']
-    
+        result = self._check_query_result(login, response)
+        return result
+
     def get_dns_records(self):
         """
         Метод получения списка всех DNS-записей для домена
         """
         response = self.api_method('list?', type='dns')
         return response
-        
+
     def delete_dns_record(self, record_id):
         """
         Метод для удаления dns записи
@@ -98,10 +119,10 @@ class DomainMail(object):
         values = {'record_id': record_id}
         response = self.api_method('del', type='dns', values=values)
         return response
-        
-    def add_dns_record(self, type, 
-                       admin_mail=None, content=None, priority=None, 
-                       weight=None, port=None, target=None, 
+
+    def add_dns_record(self, type,
+                       admin_mail=None, content=None, priority=None,
+                       weight=None, port=None, target=None,
                        subdomain=None, ttl=None):
         """
         Метод для добавления dns записи
@@ -126,12 +147,12 @@ class DomainMail(object):
                   'ttl': ttl}
         response = self.api_method('add', type='dns', values=values)
         return response
-        
-    def edit_dns_record(self, record_id, 
-                       admin_mail=None, content=None, priority=None, 
-                       weight=None, port=None, target=None, 
-                       subdomain=None, ttl=None, refresh=None,
-                       retry=None, expire=None, neg_cache=None):
+
+    def edit_dns_record(self, record_id,
+                        admin_mail=None, content=None, priority=None,
+                        weight=None, port=None, target=None,
+                        subdomain=None, ttl=None, refresh=None,
+                        retry=None, expire=None, neg_cache=None):
         """
         Метод для добавления dns записи
         :param record_id: int
@@ -167,7 +188,8 @@ class DomainMail(object):
     def get_mails(self):
         """
         Метод получения списка почтовых ящиков
-        в зависимости от количества страниц, делает дополнительные запросы к api
+        в зависимости от количества страниц,
+        делает дополнительные запросы к api
         для получения полного списка
         :return: список ящиков
         """
@@ -186,7 +208,6 @@ class DomainMail(object):
             account_list += response['accounts']
 
         return account_list
-
 
     def get_mailing_list(self):
         """
@@ -226,11 +247,13 @@ class DomainMail(object):
     def _params_injection(self, params=None):
         """
         Вставляет определенные значения полей пользователю
-        Используется для добавления имени, фимилии и секретного вопроса созданному пользователю
+        Используется для добавления
+        имени, фaмилии и секретного вопроса созданному пользователю
         :param params: словать значений полей(фио, секретный вопрос и т.п.)
         :return:
         """
-        default = {'hintq': 'Введите ваше любимое случайное число', 'hinta': '123четыре'}
+        default = {'hintq': 'Введите ваше любимое случайное число',
+                   'hinta': '123четыре'}
         if params:
             params.update(default)
         else:
@@ -253,8 +276,8 @@ class DomainMail(object):
 
     def _create_data_file(self, login, password, params):
         with open('data.txt', 'a', encoding='UTF-8') as f:
-            f.write('Данные для входа в доменную почту'+'\n')
-            f.write(params['iname']+' '+params['fname']+'\n')
-            f.write('Логин: '+login+'@dezgp.ru'+'\n')
-            f.write('Пароль: '+password+'\n')
-            f.write('Ссылка для входа: yandex.ru'+'\n\n')
+            f.write('Данные для входа в доменную почту' + '\n')
+            f.write(params['iname'] + ' ' + params['fname'] + '\n')
+            f.write('Логин: ' + login + '@dezgp.ru' + '\n')
+            f.write('Пароль: ' + password + '\n')
+            f.write('Ссылка для входа: yandex.ru' + '\n\n')

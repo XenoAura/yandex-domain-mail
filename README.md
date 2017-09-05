@@ -23,26 +23,29 @@ app.get_mails()   # получение списка ящиков
 
 Остальные методы
 ----
-create_mail(login, password)
+`create_mail(login, password)`
 : Создание ящика
 
-delete_mail(login)
+`delete_mail(login)`
 : Удаление ящика
 
-edit_mail(login, args)
+`edit_mail(login, args)`
 : Изменение атрибутов пользователя(фио, секретный вопрос и т.п.) полный список:
 : https://tech.yandex.ru/pdd/doc/reference/email-edit-docpage/
 
-get_mails()
+`get_domains()`
+: получить список доменов пользователя.
+
+`get_mails()`
 : Получение списка всех ящиков домена
 
-get_mailing_list()
+`get_mailing_list()`
 : Получение всех рассылок домена
 
-get_mailing_lists_subscribers()
+`get_mailing_lists_subscribers()`
 : Получение всех списков рассылок и участников в них.
 
-create_active_mail(login, password, params)
+`create_active_mail(login, password, params)`
 : Создание ящика и заполнение его информацией(фио, секретный вопрос и т.п.)
 : params передается в виде словаря: {'iname': 'Иванов', 'fname': 'Иван'}
 
