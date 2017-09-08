@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 import requests
 import json
+import math
 
 
 class DomainMail(object):
@@ -22,7 +23,7 @@ class DomainMail(object):
         values.update({'domain': self.domain})
         request_url = self.api_url + type + '/'
         post_methods = ['add', 'del', 'edit']
-        get_methods = ['list?', 'ml/list?', 'ml/subscribers?']
+        get_methods = ['list?', 'ml/list?', 'ml/subscribers?', 'domains?']
         if method in post_methods:
             response = requests.post(request_url + method, data=values,
                                      headers=self.headers)
@@ -62,10 +63,20 @@ class DomainMail(object):
         Запрос позволяет получить список доменов пользователя.
         :return:
         """
-        request_url = self.api_url + 'domain/domains'
-        response = requests.get(request_url, headers=self.headers)
-        domains = json.loads(response.text)
-        return domains['domains']
+        on_page = 10
+        values = {'on_page': on_page}
+        response = self.api_method('domains?', type='domain', values=values)
+        domains_list = response['domains']
+        pages = response['total'] / response['found']
+        pages = math.ceil(pages)
+        if pages <= 1:
+            return domains_list
+        for page_num in range(2, pages + 1):
+            values['page'] = page_num
+            response = self.api_method('domains?', type='domain',
+                                       values=values)
+            domains_list += response['domains']
+        return domains_list
 
     def create_mail(self, login, password):
         """
