@@ -1,2 +1,1 @@
-
-from main import DomainMail
+from .main import DomainMail
